@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lector de Documentos</title>
+    <title>Document Reader</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -386,7 +386,8 @@
             white-space: nowrap;
             /* Evita que el texto se rompa */
             font-weight: 500;
-            margin-right: 0.2rem; /* Pequeño espacio entre label y select */
+            margin-right: 0.2rem;
+            /* Pequeño espacio entre label y select */
         }
 
         body.dark-theme .filter-controls label {
@@ -394,9 +395,12 @@
         }
 
         .filter-controls select {
-            flex: 1; /* Permite que el select se expanda */
-            min-width: 150px; /* Ancho mínimo para legibilidad */
-            padding: 0.6rem 2.5rem 0.6rem 1rem; /* Más padding para el texto y espacio para el icono */
+            flex: 1;
+            /* Permite que el select se expanda */
+            min-width: 150px;
+            /* Ancho mínimo para legibilidad */
+            padding: 0.6rem 2.5rem 0.6rem 1rem;
+            /* Más padding para el texto y espacio para el icono */
             border-radius: 8px;
             border: 1px solid #d0d0d0;
             font-family: 'Poppins', sans-serif;
@@ -538,7 +542,8 @@
 
             .filter-controls label {
                 width: 100%;
-                text-align: left; /* Alinea las etiquetas a la izquierda */
+                text-align: left;
+                /* Alinea las etiquetas a la izquierda */
             }
 
             .filter-controls select,
@@ -614,39 +619,40 @@
 <body>
 
     <div class="top-bar">
-        <h1>Lector de Documentos</h1>
+        <h1>Document Reader</h1>
         <div class="top-bar-buttons">
             <input type="file" id="file-upload" accept=".txt" style="display: none;">
             <button class="upload-btn" id="upload-button">Cargar archivo .txt</button>
             <button id="themeToggleBtn" class="theme-toggle-btn">
-                <span id="themeIcon">🌙</span> Cambiar Estilo
+                <span id="themeIcon">🌙</span> Change Style
             </button>
         </div>
         <div class="filter-controls">
-            <label for="mainTitleFilter">Filtrar por Título:</label>
+            <label for="mainTitleFilter">Filter by Title:</label>
             <select id="mainTitleFilter">
-                <option value="">Mostrar todo</option>
+                <option value="">Show all</option>
             </select>
 
-            <label for="subtitleFilter">Filtrar por Subtítulo:</label>
+            <label for="subtitleFilter">Filter Subtítle:</label>
             <select id="subtitleFilter" disabled>
-                <option value="">Mostrar todo</option>
+                <option value="">Show all</option>
             </select>
-            <button id="clearFilterBtn">✖️ Limpiar Filtro</button>
+            <button id="clearFilterBtn">✖️ Clear Filter</button>
         </div>
     </div>
 
+
     <div class="document-container" id="document-content">
         <div class="section-card fade-in">
-            <h1>¡Bienvenido!</h1>
-            <p>Carga un archivo <code>.txt</code> para visualizar su estructura y escuchar su contenido.</p>
-            <p>Formato compatible:</p>
+            <h1>Welcome!</h1>
+            <p>Upload a <code>.txt</code> file to view its structure and hear its content.</p>
+            <p>Supported format:</p>
             <ul>
-                <li><code>#* Título Principal</code> &rarr; Se renderiza como una sección principal (<code>&lt;h1&gt;</code>)</li>
-                <li><code>* Subtítulo</code> &rarr; Se renderiza como un subtítulo (<code>&lt;h2&gt;</code>)</li>
-                <li><code>Texto plano</code> &rarr; Se renderiza como un párrafo (<code>&lt;p&gt;</code>)</li>
+                <li><code>#* Main Title</code> &rarr; Renders as a main section (<code>&lt;h1&gt;</code>)</li>
+                <li><code>* Subtitle</code> &rarr; Renders as a subtitle (<code>&lt;h2&gt;</code>)</li>
+                <li><code>Plain Text</code> &rarr; It renders as a paragraph (<code>&lt;p&gt;</code>)</li>
             </ul>
-            <p>Cada sección, subtítulo y párrafo tendrá un botón "Hablar".</p>
+            <p>Each section, subheading, and paragraph will have a "Talk" button.</p>
         </div>
     </div>
 
@@ -2036,7 +2042,7 @@ By understanding these characteristics and, most importantly, exercising caution
          * Llena el dropdown de filtro de títulos principales.
          */
         function populateMainTitleFilter() {
-            mainTitleFilter.innerHTML = '<option value="">Mostrar todo</option>'; // Opción predeterminada
+            mainTitleFilter.innerHTML = '<option value="">Show all</option>'; // Opción predeterminada
             const sortedMainTitles = Object.keys(documentData).sort();
             sortedMainTitles.forEach(title => {
                 const option = document.createElement('option');
@@ -2051,7 +2057,7 @@ By understanding these characteristics and, most importantly, exercising caution
          * @param {string} selectedMainTitle - El título principal seleccionado.
          */
         function populateSubtitleFilter(selectedMainTitle) {
-            subtitleFilter.innerHTML = '<option value="">Mostrar todo</option>';
+            subtitleFilter.innerHTML = '<option value="">Show all</option>';
             subtitleFilter.disabled = !selectedMainTitle; // Deshabilitar si no hay título principal seleccionado
 
             if (selectedMainTitle && documentData[selectedMainTitle]) {
@@ -2084,7 +2090,7 @@ By understanding these characteristics and, most importantly, exercising caution
                     showCard = true;
                     // Luego, aplicar filtro de subtítulos si existe
                     if (selectedSubtitle === '') {
-                        // No hay subtítulo seleccionado, mostrar todos los grupos de subtítulos y párrafos directos
+                        // No hay subtítulo seleccionado, Show alls los grupos de subtítulos y párrafos directos
                         subtitleGroups.forEach(group => group.classList.remove('hidden'));
                         cardParagraphs.forEach(p => p.classList.remove('hidden'));
                     } else {
@@ -2111,7 +2117,7 @@ By understanding these characteristics and, most importantly, exercising caution
                     if (cardMainTitle === selectedMainTitle) {
                         showCard = true; // Esta tarjeta coincide con el título principal seleccionado
                         if (selectedSubtitle === '') {
-                            // Título principal seleccionado, pero no hay subtítulo seleccionado, mostrar todos los grupos de subtítulos y párrafos directos dentro de esta tarjeta
+                            // Título principal seleccionado, pero no hay subtítulo seleccionado, Show alls los grupos de subtítulos y párrafos directos dentro de esta tarjeta
                             subtitleGroups.forEach(group => group.classList.remove('hidden'));
                             cardParagraphs.forEach(p => p.classList.remove('hidden'));
                         } else {
@@ -2154,7 +2160,7 @@ By understanding these characteristics and, most importantly, exercising caution
             mainTitleFilter.value = ''; // Restablecer el dropdown del título principal
             populateSubtitleFilter(''); // Limpiar y deshabilitar el filtro de subtítulos
             subtitleFilter.value = ''; // Restablecer el dropdown del subtítulo
-            applyFilter(); // Aplicar el filtro para mostrar todo
+            applyFilter(); // Aplicar el filtro para Show all
         }
 
         // Event listeners para los filtros
