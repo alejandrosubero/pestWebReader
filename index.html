@@ -1,684 +1,433 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Reader</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Estilos generales del cuerpo */
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            /* Color de fondo suave */
-            color: #333;
-            /* Color de texto contrastante */
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            /* Asegura que el cuerpo ocupe toda la altura de la ventana */
-            transition: background-color 0.3s ease, color 0.3s ease;
-            /* Transición suave para el cambio de tema */
-        }
-
-        /* Tema oscuro */
-        body.dark-theme {
-            background-color: #1a1a1a;
-            /* Fondo negro */
-            color: #00ff00;
-            /* Letras verdes retro */
-        }
-
-        /* Desplazamiento suave para una mejor experiencia de usuario */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Barra superior fija para navegación y controles */
-        .top-bar {
-            background-color: #ffffff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            /* Sombra mejorada */
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            /* Cambiado a columna para apilar elementos */
-            align-items: flex-start;
-            /* Alinea los elementos a la izquierda */
-            padding: 1rem 2rem;
-            gap: 1rem;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            /* Transición suave */
-        }
-
-        /* Contenedor para los botones de carga y tema */
-        .top-bar-buttons {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            width: 100%;
-            /* Ocupa todo el ancho disponible */
-            justify-content: space-between;
-            /* Espacia los botones */
-        }
-
-        /* Contenedor para los controles de filtro */
-        .filter-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            /* Aumentado el espacio entre elementos */
-            align-items: center;
-            width: 100%;
-            /* Ocupa todo el ancho disponible */
-            background-color: #f8f8f8;
-            /* Fondo ligeramente diferente para los filtros */
-            padding: 1rem;
-            border-radius: 10px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        body.dark-theme .filter-controls {
-            background-color: #282828;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-
-
-        /* Tema oscuro para la barra superior */
-        body.dark-theme .top-bar {
-            background-color: #333333;
-            /* Fondo más oscuro para la barra superior */
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .top-bar h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            /* Título ligeramente más grande */
-            color: #4a90e2;
-            /* Color de acento primario */
-            font-weight: 600;
-            transition: color 0.3s ease;
-            /* Transición suave */
-        }
-
-        /* Tema oscuro para el título de la barra superior */
-        body.dark-theme .top-bar h1 {
-            color: #00ff00;
-            /* Verde retro */
-        }
-
-        /* Estilo del botón de carga de archivo */
-        .upload-btn {
-            background-color: #4a90e2;
-            /* Color de acento primario */
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            /* Relleno más grande para mejor objetivo táctil */
-            border-radius: 25px;
-            /* Esquinas más redondeadas */
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            /* Transiciones suaves */
-            font-size: 1rem;
-            font-weight: 500;
-            box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);
-            /* Sombra sutil */
-        }
-
-        .upload-btn:hover {
-            background-color: #3a70c0;
-            /* Tono más oscuro al pasar el ratón */
-            transform: translateY(-2px);
-            /* Ligero efecto de elevación */
-        }
-
-        .upload-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(74, 144, 226, 0.3);
-        }
-
-        /* Área principal del contenido del documento */
-        .document-container {
-            flex-grow: 1;
-            /* Permite que el contenedor ocupe el espacio disponible */
-            padding: 2rem;
-            max-width: 900px;
-            /* Ancho máximo para legibilidad */
-            margin: 1.5rem auto;
-            /* Centra el contenido con margen */
-            display: grid;
-            /* Usa Grid para el diseño general, aunque Flexbox se usa dentro de las tarjetas */
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        /* Tarjeta de sección para cada título principal */
-        .section-card {
-            background-color: white;
-            border-radius: 12px;
-            /* Esquinas más redondeadas */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            /* Sombra más suave y grande */
-            padding: 2rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-            /* Transiciones suaves */
-            animation: fadeIn 0.6s ease-out forwards;
-            /* Animación de aparición */
-        }
-
-        /* Tema oscuro para la tarjeta de sección */
-        body.dark-theme .section-card {
-            background-color: #333333;
-            /* Fondo más oscuro para las tarjetas */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .section-card:hover {
-            transform: translateY(-3px);
-            /* Efecto de elevación al pasar el ratón */
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-        }
-
-        /* Animación para nuevas secciones */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Estilo para títulos principales (h1) dentro de las tarjetas */
-        .section-card h1 {
-            color: #333;
-            margin-top: 0;
-            margin-bottom: 1rem;
-            font-size: 2rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            /* Permite el ajuste para el botón en pantallas pequeñas */
-            border-bottom: 2px solid #e0e0e0;
-            /* Borde más claro */
-            padding-bottom: 0.8rem;
-            transition: color 0.3s ease, border-color 0.3s ease;
-            /* Transición suave */
-        }
-
-        /* Tema oscuro para títulos h1 */
-        body.dark-theme .section-card h1 {
-            color: #00ff00;
-            /* Verde retro */
-            border-color: #006600;
-            /* Borde verde más oscuro */
-        }
-
-        /* Estilo para los grupos de subtítulos */
-        .subtitle-group {
-            margin-top: 1.5rem;
-            padding-left: 1rem;
-            border-left: 3px solid #e9e9e9;
-            transition: border-color 0.3s ease;
-        }
-
-        body.dark-theme .subtitle-group {
-            border-left-color: #004400;
-        }
-
-
-        /* Estilo para subtítulos (h2) dentro de las tarjetas */
-        .section-card h2 {
-            color: #555;
-            /* Color ligeramente más suave para subtítulos */
-            margin-top: 0;
-            /* Ajustado a 0 porque el margin-top está en subtitle-group */
-            margin-bottom: 0.8rem;
-            font-size: 1.5rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            border-bottom: 1px solid #e9e9e9;
-            /* Borde aún más claro */
-            padding-bottom: 0.5rem;
-            transition: color 0.3s ease, border-color 0.3s ease;
-            /* Transición suave */
-        }
-
-        /* Tema oscuro para subtítulos h2 */
-        body.dark-theme .section-card h2 {
-            color: #00ff00;
-            /* Verde retro */
-            border-color: #004400;
-            /* Borde verde más oscuro */
-        }
-
-        /* Estilo para párrafos (p) dentro de las tarjetas */
-        .section-card p {
-            margin-bottom: 1rem;
-            font-size: 1.05rem;
-            color: #444;
-            display: flex;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            transition: color 0.3s ease;
-            /* Transición suave */
-        }
-
-        /* Tema oscuro para párrafos */
-        body.dark-theme .section-card p {
-            color: #00ff00;
-            /* Verde retro */
-        }
-
-        /* Estilo del botón de voz */
-        .speak-btn {
-            background-color: transparent;
-            border: 1px solid #4a90e2;
-            color: #4a90e2;
-            border-radius: 20px;
-            /* Botón en forma de píldora */
-            padding: 0.3rem 0.8rem;
-            /* Relleno más pequeño para ajuste en línea */
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-left: 0.75rem;
-            /* Espacio del texto */
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            /* Espacio entre el icono y el texto */
-            flex-shrink: 0;
-            /* Evita que el botón se encoja */
-        }
-
-        .speak-btn:hover {
-            background-color: #4a90e2;
-            color: white;
-            box-shadow: 0 2px 5px rgba(74, 144, 226, 0.3);
-        }
-
-        .speak-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Tema oscuro para el botón de voz */
-        body.dark-theme .speak-btn {
-            background-color: #00ff00;
-            /* Fondo verde retro */
-            color: #1a1a1a;
-            /* Texto oscuro para contraste */
-            border-color: #00ff00;
-            /* Borde verde */
-        }
-
-        body.dark-theme .speak-btn:hover {
-            background-color: #00cc00;
-            /* Verde ligeramente más oscuro al pasar el ratón */
-            color: #000000;
-            box-shadow: 0 2px 5px rgba(0, 255, 0, 0.3);
-        }
-
-        /* Estilo del botón de cambio de tema */
-        .theme-toggle-btn {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .theme-toggle-btn:hover {
-            background-color: #357ABD;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .theme-toggle-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Tema oscuro para el botón de cambio de tema */
-        body.dark-theme .theme-toggle-btn {
-            background-color: #00ff00;
-            /* Verde retro */
-            color: #1a1a1a;
-            /* Texto oscuro */
-            border: 1px solid #00ff00;
-        }
-
-        body.dark-theme .theme-toggle-btn:hover {
-            background-color: #00cc00;
-            /* Verde ligeramente más oscuro al pasar el ratón */
-            color: #000000;
-            box-shadow: 0 4px 8px rgba(0, 255, 0, 0.2);
-        }
-
-        /* Estilos para los filtros */
-        .filter-controls label {
-            color: #444;
-            transition: color 0.3s ease;
-            white-space: nowrap;
-            /* Evita que el texto se rompa */
-            font-weight: 500;
-            margin-right: 0.2rem;
-            /* Pequeño espacio entre label y select */
-        }
-
-        body.dark-theme .filter-controls label {
-            color: #00ff00;
-        }
-
-        .filter-controls select {
-            flex: 1;
-            /* Permite que el select se expanda */
-            min-width: 150px;
-            /* Ancho mínimo para legibilidad */
-            padding: 0.6rem 2.5rem 0.6rem 1rem;
-            /* Más padding para el texto y espacio para el icono */
-            border-radius: 8px;
-            border: 1px solid #d0d0d0;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.95rem;
-            background-color: white;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            -webkit-appearance: none;
-            /* Eliminar estilo predeterminado de Chrome/Safari */
-            -moz-appearance: none;
-            /* Eliminar estilo predeterminado de Firefox */
-            appearance: none;
-            /* Eliminar estilo predeterminado */
-            background-image: url('data:image/svg+xml;utf8,<svg fill="%234A90E2" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-            /* Icono de flecha SVG personalizado */
-            background-repeat: no-repeat;
-            background-position: right 0.8rem center;
-            background-size: 1.2em;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        body.dark-theme .filter-controls select {
-            background-color: #3a3a3a;
-            color: #00ff00;
-            border-color: #006600;
-            background-image: url('data:image/svg+xml;utf8,<svg fill="%2300FF00" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-        }
-
-        .filter-controls select:hover {
-            border-color: #999;
-        }
-
-        body.dark-theme .filter-controls select:hover {
-            border-color: #00cc00;
-        }
-
-        .filter-controls select:focus {
-            outline: none;
-            border-color: #4a90e2;
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
-        }
-
-        body.dark-theme .filter-controls select:focus {
-            border-color: #00ff00;
-            box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.3);
-        }
-
-        .filter-controls select:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background-color: #e0e0e0;
-            border-color: #ccc;
-            box-shadow: none;
-        }
-
-        body.dark-theme .filter-controls select:disabled {
-            background-color: #555;
-            border-color: #444;
-            color: #aaa;
-        }
-
-
-        #clearFilterBtn {
-            background-color: #e74c3c;
-            /* Un rojo más suave */
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 0.6rem 1.2rem;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            white-space: nowrap;
-            /* Evita que el texto se rompa */
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.2);
-        }
-
-        #clearFilterBtn:hover {
-            background-color: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
-        }
-
-        #clearFilterBtn:active {
-            transform: translateY(0);
-        }
-
-        body.dark-theme #clearFilterBtn {
-            background-color: #ff3333;
-            /* Rojo más brillante para el tema oscuro */
-            color: #1a1a1a;
-            border: 1px solid #ff3333;
-            box-shadow: 0 2px 5px rgba(255, 51, 51, 0.2);
-        }
-
-        body.dark-theme #clearFilterBtn:hover {
-            background-color: #cc0000;
-            box-shadow: 0 4px 8px rgba(255, 51, 51, 0.3);
-        }
-
-        /* Clase para ocultar elementos */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Ajustes responsivos */
-        @media (max-width: 768px) {
-            .top-bar {
-                padding: 1rem;
-                align-items: center;
-                /* Centra los elementos en pantallas pequeñas */
-            }
-
-            .top-bar-buttons {
-                flex-direction: column;
-                /* Apila los botones */
-                align-items: center;
-                gap: 0.8rem;
-            }
-
-            .upload-btn,
-            .theme-toggle-btn {
-                width: 100%;
-                /* Ocupa todo el ancho */
-                text-align: center;
-            }
-
-            .filter-controls {
-                flex-direction: column;
-                /* Apila los controles de filtro */
-                align-items: stretch;
-                /* Estira los elementos para ocupar el ancho */
-                gap: 0.8rem;
-            }
-
-            .filter-controls label {
-                width: 100%;
-                text-align: left;
-                /* Alinea las etiquetas a la izquierda */
-            }
-
-            .filter-controls select,
-            #clearFilterBtn {
-                width: 100%;
-                /* Ocupa todo el ancho */
-                box-sizing: border-box;
-            }
-
-            .document-container {
-                padding: 1rem;
-                margin: 1rem auto;
-            }
-
-            .section-card {
-                padding: 1.2rem;
-            }
-
-            .section-card h1 {
-                font-size: 1.7rem;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .section-card h2 {
-                font-size: 1.3rem;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .section-card p {
-                font-size: 1rem;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .speak-btn {
-                margin-left: 0;
-                margin-top: 0.5rem;
-                width: fit-content;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .top-bar h1 {
-                font-size: 1.4rem;
-            }
-
-            .upload-btn {
-                font-size: 0.9rem;
-            }
-
-            .section-card h1 {
-                font-size: 1.5rem;
-            }
-
-            .section-card h2 {
-                font-size: 1.2rem;
-            }
-
-            .section-card p {
-                font-size: 0.95rem;
-            }
-
-            .speak-btn {
-                padding: 0.2rem 0.6rem;
-                font-size: 0.8rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document Viewer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Variables CSS para temas claro y oscuro */
+    :root {
+      --bg: #f9f9f9;
+      --text: #111;
+      --accent: #4f46e5;
+      --btn-bg: #4f46e5;
+      --btn-text: #fff;
+      --header-bg: #4f46e5;
+      --speaking-bg: #da0c09; /* Color para el botón hablando */
+      --speaking-text: #fff;
+    }
+    [data-theme="dark"] {
+      --bg: #1a1a1a;
+      --text: #00ff00;
+      --accent: #00aa00;
+      --btn-bg: #005500;
+      --btn-text: #ffffff;
+      --header-bg: #333333;
+      --speaking-bg: #da0c09; /* Color para el botón hablando en tema oscuro */
+      --speaking-text: #1a1a1a;
+    }
+    /* Reseteo básico y estilos globales */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    /* Estilos del encabezado */
+    header {
+      padding: 1rem;
+      background: var(--header-bg);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    header h1 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: white;
+    }
+    /* Estilos del botón de menú */
+    .menu-button {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: white;
+    }
+    /* Estilos del menú lateral */
+    #menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 100%;
+      background: var(--bg);
+      border-right: 1px solid #ccc;
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+      padding: 1rem;
+      z-index: 10;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    [data-theme="dark"] #menu {
+        border-right: 1px solid #006600;
+        box-shadow: 2px 0 8px rgba(0,255,0,0.1);
+    }
+    #menu.open {
+      transform: translateX(0);
+    }
+    /* Estilos de botones y selects dentro del menú */
+    #menu button, #menu select {
+      display: block;
+      margin: 0;
+      padding: 0.75rem 1.5rem;
+      width: 100%;
+      background-color: var(--btn-bg);
+      color: var(--btn-text);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);
+    }
+    #menu button:hover {
+        background-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 10px rgba(74, 144, 226, 0.3);
+    }
+    #menu button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(74, 144, 226, 0.3);
+    }
+
+    #menu select {
+      background-color: var(--bg);
+      color: var(--text);
+      border: 1px solid #d0d0d0;
+      padding: 0.6rem 2.5rem 0.6rem 1rem;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="%234A90E2" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 0.8rem center;
+      background-size: 1.2em;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    [data-theme="dark"] #menu select {
+        background-color: #3a3a3a;
+        color: #00ff00;
+        border-color: #006600;
+        background-image: url('data:image/svg+xml;utf8,<svg fill="%2300FF00" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    }
+    #menu select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+    }
+    [data-theme="dark"] #menu select:focus {
+        border-color: #00ff00;
+        box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.3);
+    }
+
+    #menu label {
+        color: var(--text);
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
+    /* Estilos del área principal del contenido */
+    main {
+      flex: 1;
+      padding: 1.5rem;
+      max-width: 900px;
+      margin: 1.5rem auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      overflow-y: auto;
+    }
+    /* Estilos de las tarjetas de sección */
+    .section-card {
+        background-color: var(--bg);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 2rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+    [data-theme="dark"] .section-card {
+        background-color: #333333;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .section-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+    /* Animación de aparición */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    /* Estilos de los títulos principales (h1) */
+    .section-card h1 {
+        color: var(--accent);
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 0.8rem;
+        transition: color 0.3s ease, border-color 0.3s ease;
+    }
+    [data-theme="dark"] .section-card h1 {
+        color: #00ff00;
+        border-color: #006600;
+    }
+    /* Estilos de los grupos de subtítulos */
+    .subtitle-group {
+        margin-top: 1.5rem;
+        padding-left: 1rem;
+        border-left: 3px solid var(--accent);
+        transition: border-color 0.3s ease;
+    }
+    [data-theme="dark"] .subtitle-group {
+        border-left-color: #004400;
+    }
+    /* Estilos de los subtítulos (h2) */
+    .section-card h2 {
+        color: var(--text);
+        margin-top: 0;
+        margin-bottom: 0.8rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        border-bottom: 1px solid #e9e9e9;
+        padding-bottom: 0.5rem;
+        transition: color 0.3s ease, border-color 0.3s ease;
+    }
+    [data-theme="dark"] .section-card h2 {
+        color: #00ff00;
+        border-color: #004400;
+    }
+    /* Estilos de los párrafos (p) */
+    .section-card p {
+        margin-bottom: 1rem;
+        font-size: 1.05rem;
+        color: var(--text);
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        transition: color 0.3s ease;
+    }
+    [data-theme="dark"] .section-card p {
+        color: #00ff00;
+    }
+    /* Estilos del botón de voz */
+    .speak-btn {
+        background-color: transparent;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        border-radius: 20px;
+        padding: 0.3rem 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: 0.75rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        flex-shrink: 0;
+    }
+    .speak-btn:hover {
+        background-color: var(--accent);
+        color: white;
+        box-shadow: 0 2px 5px rgba(74, 144, 226, 0.3);
+    }
+    .speak-btn:active {
+        transform: scale(0.98);
+    }
+    /* Estilo del botón de voz cuando está hablando */
+    .speak-btn.speaking {
+        background-color: var(--speaking-bg);
+        color: var(--speaking-text);
+        border-color: var(--speaking-bg);
+        box-shadow: 0 2px 5px rgba(242, 3, 3, 0.926); /* Sombra sutil para indicar actividad */
+    }
+    [data-theme="dark"] .speak-btn {
+        background-color: #00ff00;
+        color: #1a1a1a;
+        border-color: #00ff00;
+    }
+    [data-theme="dark"] .speak-btn:hover {
+        background-color: #00cc00;
+        color: #000000;
+        box-shadow: 0 2px 5px rgba(0, 255, 0, 0.3);
+    }
+    [data-theme="dark"] .speak-btn.speaking {
+        background-color: var(--speaking-bg);
+        color: var(--speaking-text);
+        border-color: var(--speaking-bg);
+        box-shadow: 0 2px 5px rgba(255, 25, 0, 0.918);
+    }
+
+    /* Estilos del botón de limpiar filtro */
+    #clearFilterBtn {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        box-shadow: 0 2px 5px rgba(231, 76, 60, 0.2);
+    }
+    #clearFilterBtn:hover {
+        background-color: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+    }
+    #clearFilterBtn:active {
+        transform: translateY(0);
+    }
+    [data-theme="dark"] #clearFilterBtn {
+        background-color: #ff3333;
+        color: #1a1a1a;
+        border: 1px solid #ff3333;
+        box-shadow: 0 2px 5px rgba(255, 51, 51, 0.2);
+    }
+    [data-theme="dark"] #clearFilterBtn:hover {
+        background-color: #cc0000;
+        box-shadow: 0 4px 8px rgba(255, 51, 51, 0.3);
+    }
+    /* Clase para ocultar elementos */
+    .hidden {
+      display: none !important;
+    }
+    /* Media queries para diseño responsivo */
+    @media (max-width: 768px) {
+      #menu {
+        width: 80%;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      main {
+        padding: 1rem;
+        margin: 1rem auto;
+      }
+      .section-card {
+        padding: 1.2rem;
+      }
+      .section-card h1 {
+        font-size: 1.7rem;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .section-card h2 {
+        font-size: 1.3rem;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .section-card p {
+        font-size: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .speak-btn {
+        margin-left: 0;
+        margin-top: 0.5rem;
+        width: fit-content;
+      }
+    }
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.4rem;
+      }
+      #menu button, #menu select, #clearFilterBtn {
+          font-size: 0.9rem;
+          padding: 0.6rem 1rem;
+      }
+      .section-card h1 {
+        font-size: 1.5rem;
+      }
+      .section-card h2 {
+        font-size: 1.2rem;
+      }
+      .section-card p {
+        font-size: 0.95rem;
+      }
+      .speak-btn {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <header>
+    <div class="menu-button" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    <h1>Document Viewer</h1>
+  </header>
+  <div id="menu">
+    <button onclick="document.getElementById('fileInput').click()">Upload .txt</button>
+    <button onclick="toggleTheme()">Toggle Light/Dark</button>
+    <label for="mainTitleFilter">Filter Title:</label>
+    <select id="mainTitleFilter"></select>
+    <label for="subtitleFilter">Filter Subtitle:</label>
+    <select id="subtitleFilter"></select>
+    <button id="clearFilterBtn">Clear Filter</button>
+    <button onclick="toggleMenu()">Close Menu</button>
+  </div>
+  <main id="document-content"></main>
+  <input type="file" id="fileInput" style="display:none" accept=".txt" />
 
-    <div class="top-bar">
-        <h1>Document Reader</h1>
-        <div class="top-bar-buttons">
-            <input type="file" id="file-upload" accept=".txt" style="display: none;">
-            <button class="upload-btn" id="upload-button">Upload file(.txt)</button>
-            <button id="themeToggleBtn" class="theme-toggle-btn">
-                <span id="themeIcon">🌙</span> Change Style
-            </button>
-        </div>
-        <div class="filter-controls">
-            <label for="mainTitleFilter">Filter by Title:</label>
-            <select id="mainTitleFilter">
-                <option value="">Show all</option>
-            </select>
+  <script>
+    // Obtener referencias a los elementos del DOM
+    const documentContent = document.getElementById("document-content");
+    const fileInput = document.getElementById("fileInput");
+    const mainTitleFilter = document.getElementById("mainTitleFilter");
+    const subtitleFilter = document.getElementById("subtitleFilter");
+    const clearFilterBtn = document.getElementById("clearFilterBtn");
+    const synth = window.speechSynthesis; // Objeto de la API de voz
+    let currentUtterance = null; // Variable para controlar la pronunciación actual
+    let activeSpeakButton = null; // Referencia al botón que está hablando actualmente
 
-            <label for="subtitleFilter">Filter Subtítle:</label>
-            <select id="subtitleFilter" disabled>
-                <option value="">Show all</option>
-            </select>
-            <button id="clearFilterBtn">✖️ Clear Filter</button>
-        </div>
-    </div>
+    // Estructuras de datos para almacenar el contenido del documento y referencias a elementos DOM
+    let documentData = {}; // { "Main Title": Set(["Subtitle 1", "Subtitle 2"]), ... }
+    let allSectionCards = []; // Referencias a los elementos DOM de las tarjetas de sección
 
-
-    <div class="document-container" id="document-content">
-        <div class="section-card fade-in">
-            <h1>Welcome!</h1>
-            <p>Upload a <code>.txt</code> file to view its structure and hear its content.</p>
-            <p>Supported format:</p>
-            <ul>
-                <li><code>#* Main Title</code> &rarr; Renders as a main section (<code>&lt;h1&gt;</code>)</li>
-                <li><code>* Subtitle</code> &rarr; Renders as a subtitle (<code>&lt;h2&gt;</code>)</li>
-                <li><code>Plain Text</code> &rarr; It renders as a paragraph (<code>&lt;p&gt;</code>)</li>
-            </ul>
-            <p>Each section, subheading, and paragraph will have a "Talk" button.</p>
-        </div>
-    </div>
-
-    <script>
-        // Obtener referencias a los elementos del DOM
-        const uploadButton = document.getElementById('upload-button');
-        const fileUpload = document.getElementById('file-upload');
-        const documentContent = document.getElementById('document-content');
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        const themeIcon = document.getElementById('themeIcon');
-        const body = document.body;
-        const mainTitleFilter = document.getElementById('mainTitleFilter');
-        const subtitleFilter = document.getElementById('subtitleFilter');
-        const clearFilterBtn = document.getElementById('clearFilterBtn');
-
-        // Objeto de la API de voz web SpeechSynthesis
-        const synth = window.speechSynthesis;
-        // Variable para mantener la pronunciación actual, permite detenerla
-        let currentUtterance = null;
-
-        // Estructura de datos para almacenar títulos y subtítulos
-        let documentData = {}; // { "Main Title": Set(["Subtitle 1", "Subtitle 2"]), ... }
-        let allSectionCards = []; // Referencias a los elementos DOM de las tarjetas de sección
-
-        // Contenido incrustado de as.txt como texto predeterminado
-        const embeddedDocumentText = `#*Ants
+    // Contenido predeterminado para mostrar al cargar la página
+    // const defaultText = `#*Welcome\n *Intro\nThis is a test paragraph.\nHere is another sentence.\n\n *Tips\nUse the menu.\n\n#*Another Section\n *More Info\nThis is a paragraph in another section.\n\n *Conclusion\nEnd of this section.`;
+  const defaultText = `#*Ants
 
  *Carpenter Ants
 
@@ -1818,283 +1567,317 @@ While physical traits are more reliable, some behaviors can offer additional (bu
 By understanding these characteristics and, most importantly, exercising caution, you can safely coexist with Florida's diverse snake population.
 `;
 
-        // Event listener for when the DOM content is fully loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            // Parse and render the embedded document text automatically
-            parseAndRenderText(embeddedDocumentText);
-            // Cargar el tema guardado o establecer el predeterminado
-            loadTheme();
-        });
+    // Evento que se dispara cuando el DOM está completamente cargado
+    document.addEventListener('DOMContentLoaded', () => {
+        parseAndRenderText(defaultText); // Parsear y renderizar el texto predeterminado
+        loadTheme(); // Cargar el tema guardado en localStorage
+    });
 
-        /**
-         * Alterna entre el tema claro y oscuro.
-         */
-        function toggleTheme() {
-            body.classList.toggle('dark-theme');
-            // Guardar la preferencia del tema en localStorage
-            if (body.classList.contains('dark-theme')) {
-                localStorage.setItem('theme', 'dark');
-                themeIcon.textContent = '💡'; // Icono para tema claro
-            } else {
-                localStorage.setItem('theme', 'light');
-                themeIcon.textContent = '🌙'; // Icono para tema oscuro
-            }
+    /**
+     * Alterna la visibilidad del menú lateral.
+     */
+    function toggleMenu() {
+      document.getElementById("menu").classList.toggle("open");
+    }
+
+    /**
+     * Alterna entre el tema claro y oscuro y guarda la preferencia.
+     */
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.getAttribute("data-theme") === "dark") {
+        html.removeAttribute("data-theme");
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.setAttribute("data-theme", "dark");
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    /**
+     * Carga el tema guardado en localStorage al iniciar la aplicación.
+     */
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+
+    // Event listener para el cambio de archivo en el input oculto
+    fileInput.addEventListener("change", e => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = e => parseAndRenderText(e.target.result);
+      reader.readAsText(file);
+    });
+
+    /**
+     * Analiza el contenido de texto y lo renderiza en la estructura del documento.
+     * @param {string} text - El contenido de texto sin formato del archivo .txt.
+     */
+    function parseAndRenderText(text) {
+      documentContent.innerHTML = ''; // Limpiar contenido existente
+      documentData = {}; // Reiniciar datos de títulos/subtítulos
+      allSectionCards = []; // Reiniciar referencias a las tarjetas de sección
+
+      const lines = text.split('\n');
+      let currentSectionCard = null;
+      let currentMainTitle = '';
+      let currentSubtitleGroup = null;
+
+      lines.forEach(line => {
+        line = line.trim();
+
+        if (line.startsWith('#*')) {
+          // Es un título principal (h1)
+          const titleText = line.substring(2).trim();
+          currentMainTitle = titleText;
+          currentSectionCard = createSectionCard(titleText);
+          documentContent.appendChild(currentSectionCard);
+          allSectionCards.push(currentSectionCard);
+          documentData[currentMainTitle] = documentData[currentMainTitle] || new Set();
+          currentSubtitleGroup = null; // Reiniciar el grupo de subtítulos para la nueva sección
+        } else if (line.startsWith('*')) {
+          // Es un subtítulo (h2)
+          const subtitleText = line.substring(1).trim();
+          if (currentSectionCard) {
+            currentSubtitleGroup = createSubtitleGroup(subtitleText, currentMainTitle);
+            currentSectionCard.appendChild(currentSubtitleGroup);
+            documentData[currentMainTitle].add(subtitleText); // Añadir subtítulo al set de su título principal
+          }
+        } else if (line) {
+          // Es texto plano (párrafo)
+          if (currentSubtitleGroup) {
+            const paragraph = createParagraph(line);
+            currentSubtitleGroup.appendChild(paragraph);
+          } else if (currentSectionCard) {
+            // Párrafos directos bajo un H1 sin H2 previo
+            const paragraph = createParagraph(line);
+            currentSectionCard.appendChild(paragraph);
+          }
+        }
+      });
+
+      populateMainTitleFilter(); // Llenar el filtro de títulos principales
+      populateSubtitleFilter(''); // Inicialmente, el filtro de subtítulos está vacío/deshabilitado
+      applyFilter(); // Aplicar filtro inicial (mostrar todo)
+    }
+
+    /**
+     * Crea un elemento div para una tarjeta de sección (título principal).
+     * @param {string} titleText - El texto del título principal.
+     * @returns {HTMLDivElement} El elemento de tarjeta de sección.
+     */
+    function createSectionCard(titleText) {
+      const sectionCard = document.createElement('div');
+      sectionCard.classList.add('section-card');
+
+      const title = document.createElement('h1');
+      title.textContent = titleText;
+      title.dataset.originalText = titleText; // Almacenar el texto original para filtrado
+
+      const speakButton = createSpeakButton(titleText);
+      title.appendChild(speakButton);
+
+      sectionCard.appendChild(title);
+      return sectionCard;
+    }
+
+    /**
+     * Crea un elemento div para agrupar un subtítulo y sus párrafos.
+     * @param {string} subtitleText - El texto del subtítulo.
+     * @param {string} mainTitle - El título principal al que pertenece este subtítulo.
+     * @returns {HTMLDivElement} El elemento del grupo de subtítulos.
+     */
+    function createSubtitleGroup(subtitleText, mainTitle) {
+      const subtitleGroup = document.createElement('div');
+      subtitleGroup.classList.add('subtitle-group');
+      subtitleGroup.dataset.mainTitle = mainTitle;
+      subtitleGroup.dataset.subtitle = subtitleText;
+
+      const subtitle = document.createElement('h2');
+      subtitle.textContent = subtitleText;
+      subtitle.dataset.originalText = subtitleText;
+
+      const speakButton = createSpeakButton(subtitleText);
+      subtitle.appendChild(speakButton);
+
+      subtitleGroup.appendChild(subtitle);
+      return subtitleGroup;
+    }
+
+    /**
+     * Crea un elemento p para un párrafo.
+     * @param {string} paragraphText - El texto del párrafo.
+     * @returns {HTMLParagraphElement} El elemento del párrafo.
+     */
+    function createParagraph(paragraphText) {
+      const paragraph = document.createElement('p');
+      paragraph.textContent = paragraphText;
+      paragraph.dataset.originalText = paragraphText;
+
+      const speakButton = createSpeakButton(paragraphText);
+      paragraph.appendChild(speakButton);
+
+      return paragraph;
+    }
+
+    /**
+     * Crea un botón de voz para leer el texto dado.
+     * @param {string} textToSpeak - El texto que el botón debe leer.
+     * @returns {HTMLButtonElement} El botón de voz.
+     */
+    function createSpeakButton(textToSpeak) {
+      const speakButton = document.createElement('button');
+      speakButton.classList.add('speak-btn');
+      speakButton.innerHTML = '🔊 Speak';
+      speakButton.addEventListener('click', (event) => {
+        event.stopPropagation(); // Evitar propagación de eventos
+        speakText(textToSpeak, speakButton); // Pasar el elemento del botón a speakText
+      });
+      return speakButton;
+    }
+
+    /**
+     * Inicia la síntesis de voz para el texto dado, controlando el estado visual del botón.
+     * @param {string} text - El texto a pronunciar.
+     * @param {HTMLElement} buttonElement - El elemento del botón que activó la voz.
+     */
+    function speakText(text, buttonElement) {
+      // Si ya hay una reproducción activa y es el mismo botón, detenerla
+      if (synth.speaking && currentUtterance && currentUtterance.text === text && activeSpeakButton === buttonElement) {
+        synth.cancel();
+        currentUtterance = null;
+        if (activeSpeakButton) {
+          activeSpeakButton.classList.remove('speaking');
+          activeSpeakButton = null;
+        }
+      } else {
+        // Si se inicia una nueva reproducción o es un botón diferente
+        if (synth.speaking) {
+          synth.cancel(); // Cancelar la reproducción actual
+          if (activeSpeakButton) { // Revertir el color del botón anterior si existe
+            activeSpeakButton.classList.remove('speaking');
+          }
         }
 
-        /**
-         * Carga el tema guardado en localStorage o establece el predeterminado.
-         */
-        function loadTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                body.classList.add('dark-theme');
-                themeIcon.textContent = '💡'; // Icono para tema claro
-            } else {
-                // Por defecto es tema claro si no hay nada guardado o es 'light'
-                body.classList.remove('dark-theme');
-                themeIcon.textContent = '🌙'; // Icono para tema oscuro
-            }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US'; // Puedes cambiar esto a 'es-ES' para español si el contenido es en español
+
+        // Establecer el botón activo y cambiar su color
+        activeSpeakButton = buttonElement;
+        if (activeSpeakButton) {
+          activeSpeakButton.classList.add('speaking');
         }
 
-        // Añadir el evento click al botón de cambio de tema
-        themeToggleBtn.addEventListener('click', toggleTheme);
+        // Event listener para cuando la reproducción de voz termina
+        utterance.onend = () => {
+          if (activeSpeakButton) {
+            activeSpeakButton.classList.remove('speaking');
+            activeSpeakButton = null;
+          }
+        };
 
-        // Event listener para el clic del botón de carga de archivo, activa el input de archivo oculto
-        uploadButton.addEventListener('click', () => {
-            fileUpload.click();
-        });
+        // Event listener para cuando la reproducción de voz es cancelada (ej. por otra llamada a speakText)
+        utterance.oncancel = () => {
+          if (activeSpeakButton) {
+            activeSpeakButton.classList.remove('speaking');
+            activeSpeakButton = null;
+          }
+        };
 
-        // Event listener para cuando se selecciona un archivo en el input
-        fileUpload.addEventListener('change', (event) => {
-            const file = event.target.files[0]; // Obtener el primer archivo seleccionado
-            if (file) {
-                readFile(file); // Proceder a leer el archivo
-            }
-        });
+        synth.speak(utterance);
+        currentUtterance = utterance;
+      }
+    }
 
-        /**
-         * Lee el contenido del archivo cargado.
-         * @param {File} file - El archivo .txt a leer.
-         */
-        function readFile(file) {
-            const reader = new FileReader(); // Crear una nueva instancia de FileReader
-            reader.onload = function (event) {
-                const text = event.target.result; // Obtener el contenido de texto del archivo
-                parseAndRenderText(text); // Analizar y renderizar el texto
-            };
-            reader.readAsText(file); // Leer el file como texto plano
-        }
+    /**
+     * Llena el dropdown del filtro de títulos principales.
+     */
+    function populateMainTitleFilter() {
+      mainTitleFilter.innerHTML = '<option value="">Show all</option>'; // Opción predeterminada
+      const sortedMainTitles = Object.keys(documentData).sort();
+      sortedMainTitles.forEach(title => {
+        const option = document.createElement('option');
+        option.value = title;
+        option.textContent = title;
+        mainTitleFilter.appendChild(option);
+      });
+    }
 
-        /**
-         * Analiza el contenido del texto y lo renderiza en la estructura del documento.
-         * @param {string} text - El contenido de texto sin formato del archivo .txt.
-         */
-        function parseAndRenderText(text) {
-            documentContent.innerHTML = ''; // Limpiar cualquier contenido existente en el área de visualización
-            documentData = {}; // Reiniciar datos de títulos/subtítulos
-            allSectionCards = []; // Reiniciar referencias a las tarjetas de sección
+    /**
+     * Llena el dropdown del filtro de subtítulos basado en el título principal seleccionado.
+     * @param {string} selectedMainTitle - El título principal seleccionado.
+     */
+    function populateSubtitleFilter(selectedMainTitle) {
+        subtitleFilter.innerHTML = '<option value="">Show all</option>';
+        subtitleFilter.disabled = !selectedMainTitle; // Deshabilitar si no hay título principal seleccionado
 
-            const lines = text.split('\n'); // Dividir el texto en líneas individuales
-            let currentSectionCard = null; // Mantener un registro de la tarjeta de sección actual (grupo h1)
-            let currentMainTitle = ''; // Para almacenar el título H1 actual
-
-            let currentSubtitleGroup = null; // Para agrupar H2 y sus P's
-
-            lines.forEach(line => {
-                line = line.trim(); // Eliminar espacios en blanco del principio y final de cada línea
-
-                if (line.startsWith('#*')) {
-                    // Si la línea comienza con '#*', es un título principal (h1)
-                    const titleText = line.substring(2).trim(); // Extraer el texto del título
-                    currentMainTitle = titleText; // Actualizar el título principal actual
-                    currentSectionCard = createSectionCard(titleText); // Crear una nueva tarjeta de sección
-                    documentContent.appendChild(currentSectionCard); // Añadir la nueva tarjeta de sección al documento
-                    allSectionCards.push(currentSectionCard); // Almacenar referencia a la tarjeta
-                    documentData[currentMainTitle] = documentData[currentMainTitle] || new Set(); // Inicializar set para subtítulos
-                    currentSubtitleGroup = null; // Reiniciar el grupo de subtítulos para la nueva sección
-                } else if (line.startsWith('*')) {
-                    // Si la línea comienza con '*', es un subtítulo (h2)
-                    const subtitleText = line.substring(1).trim(); // Extraer el texto del subtítulo
-                    if (currentSectionCard) {
-                        // Crear un nuevo grupo de subtítulos para este H2 y sus P's siguientes
-                        currentSubtitleGroup = createSubtitleGroup(subtitleText, currentMainTitle);
-                        currentSectionCard.appendChild(currentSubtitleGroup);
-                        // Almacenar el subtítulo para el dropdown del filtro, vinculándolo a su sección principal
-                        documentData[currentMainTitle].add(subtitleText);
-                    }
-                } else if (line) {
-                    // Si es texto plano (y no está vacío), es un párrafo (p)
-                    if (currentSubtitleGroup) { // Si hay un grupo de subtítulos activo, añadir el párrafo a él
-                        const paragraph = createParagraph(line);
-                        currentSubtitleGroup.appendChild(paragraph);
-                    } else if (currentSectionCard) { // Si no hay grupo de subtítulos, pero sí una tarjeta de sección, añadir el párrafo directamente a la sección (para párrafos bajo H1 pero antes del primer H2)
-                        const paragraph = createParagraph(line);
-                        currentSectionCard.appendChild(paragraph);
-                    }
-                }
-            });
-
-            populateMainTitleFilter(); // Llenar el dropdown del filtro principal
-            populateSubtitleFilter(''); // Inicialmente, el filtro de subtítulos está vacío/deshabilitado
-        }
-
-        /**
-         * Crea una nueva tarjeta de sección (div) para un título principal y su contenido.
-         * @param {string} titleText - El texto para el título principal (h1).
-         * @returns {HTMLDivElement} El elemento de tarjeta de sección creado.
-         */
-        function createSectionCard(titleText) {
-            const sectionCard = document.createElement('div');
-            sectionCard.classList.add('section-card');
-
-            const title = document.createElement('h1');
-            title.textContent = titleText;
-            title.dataset.originalText = titleText; // Almacenar el texto original
-
-            const speakButton = createSpeakButton(titleText); // Crear un botón de voz para el título
-            title.appendChild(speakButton); // Añadir el botón de voz al título
-
-            sectionCard.appendChild(title); // Añadir el título a la tarjeta de sección
-            return sectionCard;
-        }
-
-        /**
-         * Crea un elemento div para agrupar un subtítulo (h2) y sus párrafos.
-         * @param {string} subtitleText - El texto para el subtítulo (h2).
-         * @param {string} mainTitle - El título principal al que pertenece este subtítulo.
-         * @returns {HTMLDivElement} El elemento div del grupo de subtítulos creado.
-         */
-        function createSubtitleGroup(subtitleText, mainTitle) {
-            const subtitleGroup = document.createElement('div');
-            subtitleGroup.classList.add('subtitle-group');
-            subtitleGroup.dataset.mainTitle = mainTitle; // Añadir data attribute para el título principal
-            subtitleGroup.dataset.subtitle = subtitleText; // Añadir data attribute para el subtítulo
-
-            const subtitle = document.createElement('h2');
-            subtitle.textContent = subtitleText;
-            subtitle.dataset.originalText = subtitleText; // Almacenar el texto original
-
-            const speakButton = createSpeakButton(subtitleText); // Crear un botón de voz para el subtítulo
-            subtitle.appendChild(speakButton); // Añadir el botón de voz al subtítulo
-
-            subtitleGroup.appendChild(subtitle);
-            return subtitleGroup;
-        }
-
-        /**
-         * Crea un elemento p para un párrafo.
-         * @param {string} paragraphText - El texto para el párrafo (p).
-         * @returns {HTMLParagraphElement} El elemento p creado.
-         */
-        function createParagraph(paragraphText) {
-            const paragraph = document.createElement('p');
-            paragraph.textContent = paragraphText;
-            paragraph.dataset.originalText = paragraphText; // Almacenar el texto original
-
-            const speakButton = createSpeakButton(paragraphText); // Crear un botón de voz para el párrafo
-            paragraph.appendChild(speakButton); // Añadir el botón de voz al párrafo
-
-            return paragraph;
-        }
-
-        /**
-         * Crea un botón "Speak" con el icono del altavoz.
-         * @param {string} textToSpeak - El texto que este botón debe leer en voz alta.
-         * @returns {HTMLButtonElement} El elemento del botón de voz creado.
-         */
-        function createSpeakButton(textToSpeak) {
-            const speakButton = document.createElement('button');
-            speakButton.classList.add('speak-btn');
-            // Usando un emoji Unicode de altavoz para el texto del botón
-            speakButton.innerHTML = '🔊 Speak';
-            // Añadir un oyente de eventos para activar la voz al hacer clic
-            speakButton.addEventListener('click', (event) => {
-                event.stopPropagation(); // Evitar la posible propagación si los elementos están anidados
-                speakText(textToSpeak);
-            });
-            return speakButton;
-        }
-
-        /**
-         * Inicia la conversión de texto a voz para el texto dado.
-         * Detiene cualquier pronunciación actual antes de iniciar una nueva,
-         * o detiene la pronunciación actual si es la misma que se solicitó.
-         * @param {string} text - El texto a pronunciar.
-         */
-        function speakText(text) {
-            // Si el sintetizador está hablando Y la pronunciación actual es la misma que la solicitada
-            if (synth.speaking && currentUtterance && currentUtterance.text === text) {
-                synth.cancel(); // Detener la pronunciación actual
-                currentUtterance = null; // Limpiar la referencia
-            } else {
-                // Si no está hablando, o está hablando un texto diferente, cancelar el actual y empezar uno nuevo.
-                if (synth.speaking) {
-                    synth.cancel();
-                }
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US'; // Establecer el idioma a inglés de EE. UU.
-                synth.speak(utterance);
-                currentUtterance = utterance;
-            }
-        }
-
-        /**
-         * Llena el dropdown de filtro de títulos principales.
-         */
-        function populateMainTitleFilter() {
-            mainTitleFilter.innerHTML = '<option value="">Show all</option>'; // Opción predeterminada
-            const sortedMainTitles = Object.keys(documentData).sort();
-            sortedMainTitles.forEach(title => {
+        if (selectedMainTitle && documentData[selectedMainTitle]) {
+            const sortedSubtitles = Array.from(documentData[selectedMainTitle]).sort();
+            sortedSubtitles.forEach(subtitle => {
                 const option = document.createElement('option');
-                option.value = title;
-                option.textContent = title;
-                mainTitleFilter.appendChild(option);
+                option.value = subtitle;
+                option.textContent = subtitle;
+                subtitleFilter.appendChild(option);
             });
         }
+    }
 
-        /**
-         * Llena el dropdown de filtro de subtítulos basado en el título principal seleccionado.
-         * @param {string} selectedMainTitle - El título principal seleccionado.
-         */
-        function populateSubtitleFilter(selectedMainTitle) {
-            subtitleFilter.innerHTML = '<option value="">Show all</option>';
-            subtitleFilter.disabled = !selectedMainTitle; // Deshabilitar si no hay título principal seleccionado
+    /**
+     * Aplica el filtro de títulos y subtítulos, mostrando solo el contenido relevante.
+     */
+    function applyFilter() {
+        const selectedMainTitle = mainTitleFilter.value;
+        const selectedSubtitle = subtitleFilter.value;
 
-            if (selectedMainTitle && documentData[selectedMainTitle]) {
-                const sortedSubtitles = Array.from(documentData[selectedMainTitle]).sort();
-                sortedSubtitles.forEach(subtitle => {
-                    const option = document.createElement('option');
-                    option.value = subtitle;
-                    option.textContent = subtitle;
-                    subtitleFilter.appendChild(option);
-                });
-            }
-        }
+        allSectionCards.forEach(card => {
+            const cardMainTitle = card.querySelector('h1').dataset.originalText;
+            const subtitleGroups = card.querySelectorAll('.subtitle-group');
+            const cardParagraphs = card.querySelectorAll('p:not(.subtitle-group p)'); // Párrafos que no están dentro de un subtitle-group
 
-        /**
-         * Aplica el filtro de títulos y subtítulos, mostrando solo el contenido relevante.
-         */
-        function applyFilter() {
-            const selectedMainTitle = mainTitleFilter.value;
-            const selectedSubtitle = subtitleFilter.value;
+            let showCard = false; // Bandera para determinar si la tarjeta de sección completa debe mostrarse
 
-            allSectionCards.forEach(card => {
-                const cardMainTitle = card.querySelector('h1').dataset.originalText;
-                const subtitleGroups = card.querySelectorAll('.subtitle-group');
-                const cardParagraphs = card.querySelectorAll('p:not(.subtitle-group p)'); // Párrafos que no están dentro de un subtitle-group
+            if (selectedMainTitle === '') {
+                // No hay título principal seleccionado, mostrar todas las tarjetas principales
+                showCard = true;
+                // Luego, aplicar filtro de subtítulos si existe
+                if (selectedSubtitle === '') {
+                    // No hay subtítulo seleccionado, mostrar todos los grupos de subtítulos y párrafos directos
+                    subtitleGroups.forEach(group => group.classList.remove('hidden'));
+                    cardParagraphs.forEach(p => p.classList.remove('hidden'));
+                } else {
+                    // Subtítulo seleccionado, ocultar grupos que no coinciden
+                    let foundSubtitleInCard = false;
+                    subtitleGroups.forEach(group => {
+                        if (group.dataset.subtitle === selectedSubtitle) {
+                            group.classList.remove('hidden');
+                            foundSubtitleInCard = true;
+                        } else {
+                            group.classList.add('hidden');
+                        }
+                    });
+                    // Ocultar párrafos directos si se está filtrando por subtítulo
+                    cardParagraphs.forEach(p => p.classList.add('hidden'));
 
-                let showCard = false; // Bandera para determinar si la tarjeta de sección completa debe mostrarse
-
-                if (selectedMainTitle === '') {
-                    // No hay título principal seleccionado, mostrar todas las tarjetas principales
-                    showCard = true;
-                    // Luego, aplicar filtro de subtítulos si existe
+                    // Si el subtítulo seleccionado no se encontró en esta tarjeta, ocultar la tarjeta
+                    if (!foundSubtitleInCard) {
+                        showCard = false;
+                    }
+                }
+            } else {
+                // Un título principal ESTÁ seleccionado
+                if (cardMainTitle === selectedMainTitle) {
+                    showCard = true; // Esta tarjeta coincide con el título principal seleccionado
                     if (selectedSubtitle === '') {
-                        // No hay subtítulo seleccionado, Show alls los grupos de subtítulos y párrafos directos
+                        // Título principal seleccionado, pero no hay subtítulo seleccionado, mostrar todos los grupos de subtítulos y párrafos directos dentro de esta tarjeta
                         subtitleGroups.forEach(group => group.classList.remove('hidden'));
                         cardParagraphs.forEach(p => p.classList.remove('hidden'));
                     } else {
-                        // Subtítulo seleccionado, ocultar grupos que no coinciden
+                        // Tanto el título principal COMO el subtítulo están seleccionados
                         let foundSubtitleInCard = false;
                         subtitleGroups.forEach(group => {
                             if (group.dataset.subtitle === selectedSubtitle) {
@@ -2107,73 +1890,46 @@ By understanding these characteristics and, most importantly, exercising caution
                         // Ocultar párrafos directos si se está filtrando por subtítulo
                         cardParagraphs.forEach(p => p.classList.add('hidden'));
 
-                        // Si el subtítulo seleccionado no se encontró en esta tarjeta, ocultar la tarjeta
+                        // Si el subtítulo seleccionado NO se encuentra dentro de la tarjeta del título principal seleccionado, ocultar la tarjeta
                         if (!foundSubtitleInCard) {
                             showCard = false;
                         }
                     }
                 } else {
-                    // Un título principal ESTÁ seleccionado
-                    if (cardMainTitle === selectedMainTitle) {
-                        showCard = true; // Esta tarjeta coincide con el título principal seleccionado
-                        if (selectedSubtitle === '') {
-                            // Título principal seleccionado, pero no hay subtítulo seleccionado, Show alls los grupos de subtítulos y párrafos directos dentro de esta tarjeta
-                            subtitleGroups.forEach(group => group.classList.remove('hidden'));
-                            cardParagraphs.forEach(p => p.classList.remove('hidden'));
-                        } else {
-                            // Tanto el título principal COMO el subtítulo están seleccionados
-                            let foundSubtitleInCard = false;
-                            subtitleGroups.forEach(group => {
-                                if (group.dataset.subtitle === selectedSubtitle) {
-                                    group.classList.remove('hidden');
-                                    foundSubtitleInCard = true;
-                                } else {
-                                    group.classList.add('hidden');
-                                }
-                            });
-                            // Ocultar párrafos directos si se está filtrando por subtítulo
-                            cardParagraphs.forEach(p => p.classList.add('hidden'));
-
-                            // Si el subtítulo seleccionado NO se encuentra dentro de la tarjeta del título principal seleccionado, ocultar la tarjeta
-                            if (!foundSubtitleInCard) {
-                                showCard = false;
-                            }
-                        }
-                    } else {
-                        // Esta tarjeta NO coincide con el título principal seleccionado, así que ocultarla
-                        showCard = false;
-                    }
+                    // Esta tarjeta NO coincide con el título principal seleccionado, así que ocultarla
+                    showCard = false;
                 }
+            }
 
-                if (showCard) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-        }
-
-        /**
-         * Limpia el filtro y muestra todo el contenido.
-         */
-        function clearFilter() {
-            mainTitleFilter.value = ''; // Restablecer el dropdown del título principal
-            populateSubtitleFilter(''); // Limpiar y deshabilitar el filtro de subtítulos
-            subtitleFilter.value = ''; // Restablecer el dropdown del subtítulo
-            applyFilter(); // Aplicar el filtro para Show all
-        }
-
-        // Event listeners para los filtros
-        mainTitleFilter.addEventListener('change', () => {
-            const selectedMainTitle = mainTitleFilter.value;
-            populateSubtitleFilter(selectedMainTitle); // Rellenar el filtro de subtítulos basado en el título principal
-            subtitleFilter.value = ''; // Restablecer el filtro de subtítulos
-            applyFilter(); // Aplicar el filtro
+            if (showCard) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
         });
+    }
 
-        subtitleFilter.addEventListener('change', applyFilter); // Aplicar filtro cuando el subtítulo cambia
-        clearFilterBtn.addEventListener('click', clearFilter); // Limpiar filtro al hacer clic en el botón
-    </script>
+    /**
+     * Limpia el filtro y muestra todo el contenido.
+     */
+    function clearFilter() {
+        mainTitleFilter.value = ''; // Restablecer el dropdown del título principal
+        populateSubtitleFilter(''); // Limpiar y deshabilitar el filtro de subtítulos
+        subtitleFilter.value = ''; // Restablecer el dropdown del subtítulo
+        applyFilter(); // Aplicar el filtro para mostrar todo
+    }
+
+    // Event listeners para los filtros y el botón de limpiar
+    mainTitleFilter.addEventListener('change', () => {
+        const selectedMainTitle = mainTitleFilter.value;
+        populateSubtitleFilter(selectedMainTitle); // Rellenar el filtro de subtítulos basado en el título principal
+        subtitleFilter.value = ''; // Restablecer el filtro de subtítulos
+        applyFilter(); // Aplicar el filtro
+    });
+
+    subtitleFilter.addEventListener('change', applyFilter); // Aplicar filtro cuando el subtítulo cambia
+    clearFilterBtn.addEventListener('click', clearFilter); // Limpiar filtro al hacer clic en el botón
+
+  </script>
 </body>
-
 </html>
