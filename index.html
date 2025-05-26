@@ -49,16 +49,49 @@
             top: 0;
             z-index: 100;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            /* Cambiado a columna para apilar elementos */
+            align-items: flex-start;
+            /* Alinea los elementos a la izquierda */
             padding: 1rem 2rem;
-            flex-wrap: wrap;
-            /* Permite el ajuste en pantallas más pequeñas */
             gap: 1rem;
-            /* Espacio entre elementos */
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
             /* Transición suave */
         }
+
+        /* Contenedor para los botones de carga y tema */
+        .top-bar-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            width: 100%;
+            /* Ocupa todo el ancho disponible */
+            justify-content: space-between;
+            /* Espacia los botones */
+        }
+
+        /* Contenedor para los controles de filtro */
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            /* Aumentado el espacio entre elementos */
+            align-items: center;
+            width: 100%;
+            /* Ocupa todo el ancho disponible */
+            background-color: #f8f8f8;
+            /* Fondo ligeramente diferente para los filtros */
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark-theme .filter-controls {
+            background-color: #282828;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
 
         /* Tema oscuro para la barra superior */
         body.dark-theme .top-bar {
@@ -82,6 +115,37 @@
         body.dark-theme .top-bar h1 {
             color: #00ff00;
             /* Verde retro */
+        }
+
+        /* Estilo del botón de carga de archivo */
+        .upload-btn {
+            background-color: #4a90e2;
+            /* Color de acento primario */
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            /* Relleno más grande para mejor objetivo táctil */
+            border-radius: 25px;
+            /* Esquinas más redondeadas */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            /* Transiciones suaves */
+            font-size: 1rem;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);
+            /* Sombra sutil */
+        }
+
+        .upload-btn:hover {
+            background-color: #3a70c0;
+            /* Tono más oscuro al pasar el ratón */
+            transform: translateY(-2px);
+            /* Ligero efecto de elevación */
+        }
+
+        .upload-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(74, 144, 226, 0.3);
         }
 
         /* Área principal del contenido del documento */
@@ -165,11 +229,25 @@
             /* Borde verde más oscuro */
         }
 
+        /* Estilo para los grupos de subtítulos */
+        .subtitle-group {
+            margin-top: 1.5rem;
+            padding-left: 1rem;
+            border-left: 3px solid #e9e9e9;
+            transition: border-color 0.3s ease;
+        }
+
+        body.dark-theme .subtitle-group {
+            border-left-color: #004400;
+        }
+
+
         /* Estilo para subtítulos (h2) dentro de las tarjetas */
         .section-card h2 {
             color: #555;
             /* Color ligeramente más suave para subtítulos */
-            margin-top: 1.5rem;
+            margin-top: 0;
+            /* Ajustado a 0 porque el margin-top está en subtitle-group */
             margin-bottom: 0.8rem;
             font-size: 1.5rem;
             font-weight: 600;
@@ -215,7 +293,7 @@
             border: 1px solid #4a90e2;
             color: #4a90e2;
             border-radius: 20px;
-            /* Botón en forma de píldula */
+            /* Botón en forma de píldora */
             padding: 0.3rem 0.8rem;
             /* Relleno más pequeño para ajuste en línea */
             cursor: pointer;
@@ -301,18 +379,173 @@
             box-shadow: 0 4px 8px rgba(0, 255, 0, 0.2);
         }
 
+        /* Estilos para los filtros */
+        .filter-controls label {
+            color: #444;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+            /* Evita que el texto se rompa */
+            font-weight: 500;
+            margin-right: 0.2rem; /* Pequeño espacio entre label y select */
+        }
+
+        body.dark-theme .filter-controls label {
+            color: #00ff00;
+        }
+
+        .filter-controls select {
+            flex: 1; /* Permite que el select se expanda */
+            min-width: 150px; /* Ancho mínimo para legibilidad */
+            padding: 0.6rem 2.5rem 0.6rem 1rem; /* Más padding para el texto y espacio para el icono */
+            border-radius: 8px;
+            border: 1px solid #d0d0d0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            background-color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            -webkit-appearance: none;
+            /* Eliminar estilo predeterminado de Chrome/Safari */
+            -moz-appearance: none;
+            /* Eliminar estilo predeterminado de Firefox */
+            appearance: none;
+            /* Eliminar estilo predeterminado */
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%234A90E2" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            /* Icono de flecha SVG personalizado */
+            background-repeat: no-repeat;
+            background-position: right 0.8rem center;
+            background-size: 1.2em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-theme .filter-controls select {
+            background-color: #3a3a3a;
+            color: #00ff00;
+            border-color: #006600;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%2300FF00" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+        }
+
+        .filter-controls select:hover {
+            border-color: #999;
+        }
+
+        body.dark-theme .filter-controls select:hover {
+            border-color: #00cc00;
+        }
+
+        .filter-controls select:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+        }
+
+        body.dark-theme .filter-controls select:focus {
+            border-color: #00ff00;
+            box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.3);
+        }
+
+        .filter-controls select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #e0e0e0;
+            border-color: #ccc;
+            box-shadow: none;
+        }
+
+        body.dark-theme .filter-controls select:disabled {
+            background-color: #555;
+            border-color: #444;
+            color: #aaa;
+        }
+
+
+        #clearFilterBtn {
+            background-color: #e74c3c;
+            /* Un rojo más suave */
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            white-space: nowrap;
+            /* Evita que el texto se rompa */
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.2);
+        }
+
+        #clearFilterBtn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        #clearFilterBtn:active {
+            transform: translateY(0);
+        }
+
+        body.dark-theme #clearFilterBtn {
+            background-color: #ff3333;
+            /* Rojo más brillante para el tema oscuro */
+            color: #1a1a1a;
+            border: 1px solid #ff3333;
+            box-shadow: 0 2px 5px rgba(255, 51, 51, 0.2);
+        }
+
+        body.dark-theme #clearFilterBtn:hover {
+            background-color: #cc0000;
+            box-shadow: 0 4px 8px rgba(255, 51, 51, 0.3);
+        }
+
+        /* Clase para ocultar elementos */
+        .hidden {
+            display: none !important;
+        }
 
         /* Ajustes responsivos */
         @media (max-width: 768px) {
             .top-bar {
-                flex-direction: column;
-                align-items: flex-start;
                 padding: 1rem;
+                align-items: center;
+                /* Centra los elementos en pantallas pequeñas */
             }
 
-            .top-bar h1 {
-                margin-bottom: 0.8rem;
-                font-size: 1.6rem;
+            .top-bar-buttons {
+                flex-direction: column;
+                /* Apila los botones */
+                align-items: center;
+                gap: 0.8rem;
+            }
+
+            .upload-btn,
+            .theme-toggle-btn {
+                width: 100%;
+                /* Ocupa todo el ancho */
+                text-align: center;
+            }
+
+            .filter-controls {
+                flex-direction: column;
+                /* Apila los controles de filtro */
+                align-items: stretch;
+                /* Estira los elementos para ocupar el ancho */
+                gap: 0.8rem;
+            }
+
+            .filter-controls label {
+                width: 100%;
+                text-align: left; /* Alinea las etiquetas a la izquierda */
+            }
+
+            .filter-controls select,
+            #clearFilterBtn {
+                width: 100%;
+                /* Ocupa todo el ancho */
+                box-sizing: border-box;
             }
 
             .document-container {
@@ -354,6 +587,10 @@
                 font-size: 1.4rem;
             }
 
+            .upload-btn {
+                font-size: 0.9rem;
+            }
+
             .section-card h1 {
                 font-size: 1.5rem;
             }
@@ -378,27 +615,63 @@
 
     <div class="top-bar">
         <h1>Lector de Documentos</h1>
-        <button id="themeToggleBtn" class="theme-toggle-btn">
-            <span id="themeIcon">💡</span> Change Style
-        </button>
+        <div class="top-bar-buttons">
+            <input type="file" id="file-upload" accept=".txt" style="display: none;">
+            <button class="upload-btn" id="upload-button">Cargar archivo .txt</button>
+            <button id="themeToggleBtn" class="theme-toggle-btn">
+                <span id="themeIcon">🌙</span> Cambiar Estilo
+            </button>
+        </div>
+        <div class="filter-controls">
+            <label for="mainTitleFilter">Filtrar por Título:</label>
+            <select id="mainTitleFilter">
+                <option value="">Mostrar todo</option>
+            </select>
+
+            <label for="subtitleFilter">Filtrar por Subtítulo:</label>
+            <select id="subtitleFilter" disabled>
+                <option value="">Mostrar todo</option>
+            </select>
+            <button id="clearFilterBtn">✖️ Limpiar Filtro</button>
+        </div>
     </div>
 
     <div class="document-container" id="document-content">
+        <div class="section-card fade-in">
+            <h1>¡Bienvenido!</h1>
+            <p>Carga un archivo <code>.txt</code> para visualizar su estructura y escuchar su contenido.</p>
+            <p>Formato compatible:</p>
+            <ul>
+                <li><code>#* Título Principal</code> &rarr; Se renderiza como una sección principal (<code>&lt;h1&gt;</code>)</li>
+                <li><code>* Subtítulo</code> &rarr; Se renderiza como un subtítulo (<code>&lt;h2&gt;</code>)</li>
+                <li><code>Texto plano</code> &rarr; Se renderiza como un párrafo (<code>&lt;p&gt;</code>)</li>
+            </ul>
+            <p>Cada sección, subtítulo y párrafo tendrá un botón "Hablar".</p>
         </div>
+    </div>
 
     <script>
         // Obtener referencias a los elementos del DOM
+        const uploadButton = document.getElementById('upload-button');
+        const fileUpload = document.getElementById('file-upload');
         const documentContent = document.getElementById('document-content');
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         const themeIcon = document.getElementById('themeIcon');
         const body = document.body;
+        const mainTitleFilter = document.getElementById('mainTitleFilter');
+        const subtitleFilter = document.getElementById('subtitleFilter');
+        const clearFilterBtn = document.getElementById('clearFilterBtn');
 
-        // Objeto de la API de voz web SpeechSynthesis (aún presente para el botón de voz, pero sin selector)
+        // Objeto de la API de voz web SpeechSynthesis
         const synth = window.speechSynthesis;
         // Variable para mantener la pronunciación actual, permite detenerla
         let currentUtterance = null;
 
-        // Contenido incrustado de as.txt
+        // Estructura de datos para almacenar títulos y subtítulos
+        let documentData = {}; // { "Main Title": Set(["Subtitle 1", "Subtitle 2"]), ... }
+        let allSectionCards = []; // Referencias a los elementos DOM de las tarjetas de sección
+
+        // Contenido incrustado de as.txt como texto predeterminado
         const embeddedDocumentText = `#*Ants
 
  *Carpenter Ants
@@ -440,7 +713,7 @@
  Appearance: Argentine ants are small, typically 0.08 to 0.12 inches (2-3 mm) long, and uniformly dull brown in color. They have a single node on their petiole and their antennae are elbowed. A distinguishing characteristic is the greasy or stale odor they emit when crushed.
  Where They Hide: Argentine ants are highly adaptable and can nest in a wide variety of locations. They prefer moist areas but can tolerate drier conditions. Common outdoor nesting sites include shallow nests under rocks, logs, leaf litter, mulch, potted plants, stepping stones, and in cracks in pavement. Indoors, they can nest in wall voids, insulation, under floors, behind cabinets, and around pipes.
  Feeding Habits: Argentine ants are generalist feeders with a strong preference for sweets. They readily consume honeydew, fruit juices, sugary drinks, and sweet foods. They also forage for proteins and fats, including pet food, grease, and dead insects.
- What Attracts Them: Their primary attractants are moisture and food sources, especially anything sweet. They are highly attracted to honeydew produced by sap-feeding insects on plants in gardens. Any openings in a home's foundation or exterior that allow easy access will draw them in.
+ What Attracts Them: Moisture is a primary attractant, as it softens wood, making it easier to excavate. They are also drawn to decaying wood, unsealed cracks and openings in foundations and walls, and readily available food sources, especially sugary substances and proteins.
  Dangers to Humans and the Home: Argentine ants are primarily a nuisance pest. They do not sting or bite humans (though they can pinch if provoked). Their main danger is contamination of food sources and their sheer numbers. They can invade homes in massive numbers, making them extremely difficult to control. They can also displace native ant species, disrupting local ecosystems. In some agricultural settings, they can protect honeydew-producing pests like aphids, leading to increased plant damage.
  When They are Most Common/Active: Argentine ants are active year-round in warm climates. Their activity increases significantly during warmer, drier periods when outdoor food and water sources may become scarce, driving them indoors in search of resources. They are primarily diurnal foragers.
  How They Live (Colonies, Solos, Nests): Argentine ants are notorious for forming "supercolonies" comprised of numerous interconnected nests and multiple queens. This lack of inter-colony aggression allows them to expand rapidly and dominate large areas. Workers move freely between nests, sharing resources and contributing to the colony's overall success.
@@ -1037,7 +1310,7 @@
 
  *Africanized Bees ("Killer Bees", Apis mellifera scutellata x A. mellifera ligustica/mellifera)
 
- Appearance: Africanized bees are visually almost indistinguishable from European honey bees. They are slightly smaller than European honey bees but this difference is not discernible to the untrained eye. Identification requires laboratory analysis of their morphometrics (measurements).
+ Appearance: Africanized bees are visually almost indistinguishable from European honey bees. They are slightly smaller than European honey bees but this difference is not discernible to the untrained eye. Identification requires laboratory analysis of their morphometrics (meas urements).
  Where They Hide: Like European honey bees, Africanized bees build wax combs and nest in hollow trees, rock crevices, abandoned burrows, and man-made structures such as wall voids, attics, utility boxes, and discarded tires. They are known to establish smaller, more temporary nests in a wider variety of locations, including exposed areas like under eaves, or even in ground holes.
  Feeding Habits: Similar to European honey bees, they forage for nectar and pollen from flowering plants.
  What Attracts Them: Flowering plants. Suitable sheltered cavities for nesting. However, Africanized bees are known to be more opportunistic and establish nests in a broader range of sites than European honey bees.
@@ -1210,7 +1483,7 @@
  What Attracts Them: Loose, moist soil that is easy to dig, and a plentiful supply of grubs and insects in lawns and gardens. Dense vegetation or structures that provide cover for burrowing.
  Dangers to Humans and the Home:
      Health Risks: Armadillos are one of the few animals (besides humans) susceptible to leprosy (Mycobacterium leprae), and there is a very low risk of transmission to humans, primarily through direct contact with infected animals or handling their tissues. They can also carry other parasites and diseases, though generally pose a low direct health threat to humans.
-     Home/Property Damage: This is their main impact. Their incessant digging for food creates numerous shallow holes (2-5 inches deep) in lawns, gardens, and flowerbeds, causing significant aesthetic damage and tripping hazards. Their burrows can undermine foundations, driveways, sidewalks, and utility lines, potentially leading to structural damage.
+     Home/Property Damage: This is their main impact. Their incessant digging for food creates numerous shallow holes (2-5 inches deep) in lawns, gardens, and flowerbeds, causing significant aesthetic damage and tripping hazards. Their burrows can undermine foundations, seawalls, and driveways, potentially leading to structural damage.
      Pets: While not aggressive, they can scratch or bite if cornered by a pet.
  When They are Most Common/Active: Armadillos are active year-round in Florida. They are primarily nocturnal, particularly during warm months, but may be seen foraging during the day in cooler weather.
  How They Live (Colonies, Solos, Nests): Armadillos are largely solitary animals, although they may occasionally share burrows, especially during cold weather. Each individual typically maintains several burrows. Females give birth to genetically identical quadruplets. They do not form colonies.
@@ -1580,14 +1853,46 @@ By understanding these characteristics and, most importantly, exercising caution
         // Añadir el evento click al botón de cambio de tema
         themeToggleBtn.addEventListener('click', toggleTheme);
 
+        // Event listener para el clic del botón de carga de archivo, activa el input de archivo oculto
+        uploadButton.addEventListener('click', () => {
+            fileUpload.click();
+        });
+
+        // Event listener para cuando se selecciona un archivo en el input
+        fileUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0]; // Obtener el primer archivo seleccionado
+            if (file) {
+                readFile(file); // Proceder a leer el archivo
+            }
+        });
+
+        /**
+         * Lee el contenido del archivo cargado.
+         * @param {File} file - El archivo .txt a leer.
+         */
+        function readFile(file) {
+            const reader = new FileReader(); // Crear una nueva instancia de FileReader
+            reader.onload = function (event) {
+                const text = event.target.result; // Obtener el contenido de texto del archivo
+                parseAndRenderText(text); // Analizar y renderizar el texto
+            };
+            reader.readAsText(file); // Leer el file como texto plano
+        }
+
         /**
          * Analiza el contenido del texto y lo renderiza en la estructura del documento.
          * @param {string} text - El contenido de texto sin formato del archivo .txt.
          */
         function parseAndRenderText(text) {
             documentContent.innerHTML = ''; // Limpiar cualquier contenido existente en el área de visualización
+            documentData = {}; // Reiniciar datos de títulos/subtítulos
+            allSectionCards = []; // Reiniciar referencias a las tarjetas de sección
+
             const lines = text.split('\n'); // Dividir el texto en líneas individuales
             let currentSectionCard = null; // Mantener un registro de la tarjeta de sección actual (grupo h1)
+            let currentMainTitle = ''; // Para almacenar el título H1 actual
+
+            let currentSubtitleGroup = null; // Para agrupar H2 y sus P's
 
             lines.forEach(line => {
                 line = line.trim(); // Eliminar espacios en blanco del principio y final de cada línea
@@ -1595,25 +1900,36 @@ By understanding these characteristics and, most importantly, exercising caution
                 if (line.startsWith('#*')) {
                     // Si la línea comienza con '#*', es un título principal (h1)
                     const titleText = line.substring(2).trim(); // Extraer el texto del título
+                    currentMainTitle = titleText; // Actualizar el título principal actual
                     currentSectionCard = createSectionCard(titleText); // Crear una nueva tarjeta de sección
                     documentContent.appendChild(currentSectionCard); // Añadir la nueva tarjeta de sección al documento
+                    allSectionCards.push(currentSectionCard); // Almacenar referencia a la tarjeta
+                    documentData[currentMainTitle] = documentData[currentMainTitle] || new Set(); // Inicializar set para subtítulos
+                    currentSubtitleGroup = null; // Reiniciar el grupo de subtítulos para la nueva sección
                 } else if (line.startsWith('*')) {
                     // Si la línea comienza con '*', es un subtítulo (h2)
                     const subtitleText = line.substring(1).trim(); // Extraer el texto del subtítulo
                     if (currentSectionCard) {
-                        // Asegurarse de que haya una tarjeta de sección activa para añadir
-                        const subtitle = createSubtitle(subtitleText); // Crear el elemento de subtítulo
-                        currentSectionCard.appendChild(subtitle); // Añadir el subtítulo a la tarjeta de sección actual
+                        // Crear un nuevo grupo de subtítulos para este H2 y sus P's siguientes
+                        currentSubtitleGroup = createSubtitleGroup(subtitleText, currentMainTitle);
+                        currentSectionCard.appendChild(currentSubtitleGroup);
+                        // Almacenar el subtítulo para el dropdown del filtro, vinculándolo a su sección principal
+                        documentData[currentMainTitle].add(subtitleText);
                     }
                 } else if (line) {
                     // Si es texto plano (y no está vacío), es un párrafo (p)
-                    if (currentSectionCard) {
-                        // Asegurarse de que haya una tarjeta de sección activa para añadir
-                        const paragraph = createParagraph(line); // Crear el elemento de párrafo
-                        currentSectionCard.appendChild(paragraph); // Añadir el párrafo a la tarjeta de sección actual
+                    if (currentSubtitleGroup) { // Si hay un grupo de subtítulos activo, añadir el párrafo a él
+                        const paragraph = createParagraph(line);
+                        currentSubtitleGroup.appendChild(paragraph);
+                    } else if (currentSectionCard) { // Si no hay grupo de subtítulos, pero sí una tarjeta de sección, añadir el párrafo directamente a la sección (para párrafos bajo H1 pero antes del primer H2)
+                        const paragraph = createParagraph(line);
+                        currentSectionCard.appendChild(paragraph);
                     }
                 }
             });
+
+            populateMainTitleFilter(); // Llenar el dropdown del filtro principal
+            populateSubtitleFilter(''); // Inicialmente, el filtro de subtítulos está vacío/deshabilitado
         }
 
         /**
@@ -1623,10 +1939,11 @@ By understanding these characteristics and, most importantly, exercising caution
          */
         function createSectionCard(titleText) {
             const sectionCard = document.createElement('div');
-            sectionCard.classList.add('section-card'); // Añadir clase base
+            sectionCard.classList.add('section-card');
 
             const title = document.createElement('h1');
             title.textContent = titleText;
+            title.dataset.originalText = titleText; // Almacenar el texto original
 
             const speakButton = createSpeakButton(titleText); // Crear un botón de voz para el título
             title.appendChild(speakButton); // Añadir el botón de voz al título
@@ -1636,18 +1953,26 @@ By understanding these characteristics and, most importantly, exercising caution
         }
 
         /**
-         * Crea un elemento h2 para un subtítulo.
+         * Crea un elemento div para agrupar un subtítulo (h2) y sus párrafos.
          * @param {string} subtitleText - El texto para el subtítulo (h2).
-         * @returns {HTMLHeadingElement} El elemento h2 creado.
+         * @param {string} mainTitle - El título principal al que pertenece este subtítulo.
+         * @returns {HTMLDivElement} El elemento div del grupo de subtítulos creado.
          */
-        function createSubtitle(subtitleText) {
+        function createSubtitleGroup(subtitleText, mainTitle) {
+            const subtitleGroup = document.createElement('div');
+            subtitleGroup.classList.add('subtitle-group');
+            subtitleGroup.dataset.mainTitle = mainTitle; // Añadir data attribute para el título principal
+            subtitleGroup.dataset.subtitle = subtitleText; // Añadir data attribute para el subtítulo
+
             const subtitle = document.createElement('h2');
             subtitle.textContent = subtitleText;
+            subtitle.dataset.originalText = subtitleText; // Almacenar el texto original
 
             const speakButton = createSpeakButton(subtitleText); // Crear un botón de voz para el subtítulo
             subtitle.appendChild(speakButton); // Añadir el botón de voz al subtítulo
 
-            return subtitle;
+            subtitleGroup.appendChild(subtitle);
+            return subtitleGroup;
         }
 
         /**
@@ -1658,6 +1983,7 @@ By understanding these characteristics and, most importantly, exercising caution
         function createParagraph(paragraphText) {
             const paragraph = document.createElement('p');
             paragraph.textContent = paragraphText;
+            paragraph.dataset.originalText = paragraphText; // Almacenar el texto original
 
             const speakButton = createSpeakButton(paragraphText); // Crear un botón de voz para el párrafo
             paragraph.appendChild(speakButton); // Añadir el botón de voz al párrafo
@@ -1705,6 +2031,142 @@ By understanding these characteristics and, most importantly, exercising caution
                 currentUtterance = utterance;
             }
         }
+
+        /**
+         * Llena el dropdown de filtro de títulos principales.
+         */
+        function populateMainTitleFilter() {
+            mainTitleFilter.innerHTML = '<option value="">Mostrar todo</option>'; // Opción predeterminada
+            const sortedMainTitles = Object.keys(documentData).sort();
+            sortedMainTitles.forEach(title => {
+                const option = document.createElement('option');
+                option.value = title;
+                option.textContent = title;
+                mainTitleFilter.appendChild(option);
+            });
+        }
+
+        /**
+         * Llena el dropdown de filtro de subtítulos basado en el título principal seleccionado.
+         * @param {string} selectedMainTitle - El título principal seleccionado.
+         */
+        function populateSubtitleFilter(selectedMainTitle) {
+            subtitleFilter.innerHTML = '<option value="">Mostrar todo</option>';
+            subtitleFilter.disabled = !selectedMainTitle; // Deshabilitar si no hay título principal seleccionado
+
+            if (selectedMainTitle && documentData[selectedMainTitle]) {
+                const sortedSubtitles = Array.from(documentData[selectedMainTitle]).sort();
+                sortedSubtitles.forEach(subtitle => {
+                    const option = document.createElement('option');
+                    option.value = subtitle;
+                    option.textContent = subtitle;
+                    subtitleFilter.appendChild(option);
+                });
+            }
+        }
+
+        /**
+         * Aplica el filtro de títulos y subtítulos, mostrando solo el contenido relevante.
+         */
+        function applyFilter() {
+            const selectedMainTitle = mainTitleFilter.value;
+            const selectedSubtitle = subtitleFilter.value;
+
+            allSectionCards.forEach(card => {
+                const cardMainTitle = card.querySelector('h1').dataset.originalText;
+                const subtitleGroups = card.querySelectorAll('.subtitle-group');
+                const cardParagraphs = card.querySelectorAll('p:not(.subtitle-group p)'); // Párrafos que no están dentro de un subtitle-group
+
+                let showCard = false; // Bandera para determinar si la tarjeta de sección completa debe mostrarse
+
+                if (selectedMainTitle === '') {
+                    // No hay título principal seleccionado, mostrar todas las tarjetas principales
+                    showCard = true;
+                    // Luego, aplicar filtro de subtítulos si existe
+                    if (selectedSubtitle === '') {
+                        // No hay subtítulo seleccionado, mostrar todos los grupos de subtítulos y párrafos directos
+                        subtitleGroups.forEach(group => group.classList.remove('hidden'));
+                        cardParagraphs.forEach(p => p.classList.remove('hidden'));
+                    } else {
+                        // Subtítulo seleccionado, ocultar grupos que no coinciden
+                        let foundSubtitleInCard = false;
+                        subtitleGroups.forEach(group => {
+                            if (group.dataset.subtitle === selectedSubtitle) {
+                                group.classList.remove('hidden');
+                                foundSubtitleInCard = true;
+                            } else {
+                                group.classList.add('hidden');
+                            }
+                        });
+                        // Ocultar párrafos directos si se está filtrando por subtítulo
+                        cardParagraphs.forEach(p => p.classList.add('hidden'));
+
+                        // Si el subtítulo seleccionado no se encontró en esta tarjeta, ocultar la tarjeta
+                        if (!foundSubtitleInCard) {
+                            showCard = false;
+                        }
+                    }
+                } else {
+                    // Un título principal ESTÁ seleccionado
+                    if (cardMainTitle === selectedMainTitle) {
+                        showCard = true; // Esta tarjeta coincide con el título principal seleccionado
+                        if (selectedSubtitle === '') {
+                            // Título principal seleccionado, pero no hay subtítulo seleccionado, mostrar todos los grupos de subtítulos y párrafos directos dentro de esta tarjeta
+                            subtitleGroups.forEach(group => group.classList.remove('hidden'));
+                            cardParagraphs.forEach(p => p.classList.remove('hidden'));
+                        } else {
+                            // Tanto el título principal COMO el subtítulo están seleccionados
+                            let foundSubtitleInCard = false;
+                            subtitleGroups.forEach(group => {
+                                if (group.dataset.subtitle === selectedSubtitle) {
+                                    group.classList.remove('hidden');
+                                    foundSubtitleInCard = true;
+                                } else {
+                                    group.classList.add('hidden');
+                                }
+                            });
+                            // Ocultar párrafos directos si se está filtrando por subtítulo
+                            cardParagraphs.forEach(p => p.classList.add('hidden'));
+
+                            // Si el subtítulo seleccionado NO se encuentra dentro de la tarjeta del título principal seleccionado, ocultar la tarjeta
+                            if (!foundSubtitleInCard) {
+                                showCard = false;
+                            }
+                        }
+                    } else {
+                        // Esta tarjeta NO coincide con el título principal seleccionado, así que ocultarla
+                        showCard = false;
+                    }
+                }
+
+                if (showCard) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        /**
+         * Limpia el filtro y muestra todo el contenido.
+         */
+        function clearFilter() {
+            mainTitleFilter.value = ''; // Restablecer el dropdown del título principal
+            populateSubtitleFilter(''); // Limpiar y deshabilitar el filtro de subtítulos
+            subtitleFilter.value = ''; // Restablecer el dropdown del subtítulo
+            applyFilter(); // Aplicar el filtro para mostrar todo
+        }
+
+        // Event listeners para los filtros
+        mainTitleFilter.addEventListener('change', () => {
+            const selectedMainTitle = mainTitleFilter.value;
+            populateSubtitleFilter(selectedMainTitle); // Rellenar el filtro de subtítulos basado en el título principal
+            subtitleFilter.value = ''; // Restablecer el filtro de subtítulos
+            applyFilter(); // Aplicar el filtro
+        });
+
+        subtitleFilter.addEventListener('change', applyFilter); // Aplicar filtro cuando el subtítulo cambia
+        clearFilterBtn.addEventListener('click', clearFilter); // Limpiar filtro al hacer clic en el botón
     </script>
 </body>
 
